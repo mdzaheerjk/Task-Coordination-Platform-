@@ -1,0 +1,2435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link href="css/styles.css" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #858796;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --light-color: #f8f9fc;
+            --dark-color: #5a5c69;
+        }
+
+        body {
+            background-color: #f8f9fc;
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        /* Auth Pages Styling */
+        .auth-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #4e73df 0%, #224abe 100%);
+            padding: 2rem;
+        }
+
+        .auth-card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            width: 100%;
+            max-width: 450px;
+            overflow: hidden;
+        }
+
+        .auth-card-header {
+            padding: 2rem 2rem 1rem;
+            text-align: center;
+            background: white;
+        }
+
+        .site-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+        }
+
+        .auth-card-body {
+            padding: 1.5rem 2rem 2rem;
+        }
+
+        .form-floating > .form-control {
+            padding: 1rem 0.75rem;
+            height: calc(3.5rem + 2px);
+            line-height: 1.25;
+        }
+
+        .form-floating > label {
+            padding: 1rem 0.75rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            background-color: #2e59d9;
+            border-color: #2e59d9;
+            transform: translateY(-1px);
+        }
+
+        /* Main App Styling */
+        .app-page {
+            padding: 1.5rem;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Sidebar Styling */
+        .nav-link {
+            color: var(--dark-color);
+            padding: 0.75rem 1rem;
+            border-radius: 0.35rem;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background-color: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        /* Card Styling */
+        .card {
+            border: none;
+            border-radius: 0.75rem;
+            box-shadow: 0 0.15rem 1.75rem rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.15rem 1.75rem rgba(0, 0, 0, 0.1);
+        }
+
+        /* Task List Styling */
+        .task-filters .btn-group {
+            box-shadow: 0 0.15rem 1.75rem rgba(0, 0, 0, 0.05);
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .task-filters .btn {
+            padding: 0.5rem 1.25rem;
+            font-weight: 600;
+        }
+
+        .list-group-item {
+            border: none;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem !important;
+            box-shadow: 0 0.15rem 1.75rem rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .list-group-item:hover {
+            transform: translateX(5px);
+        }
+
+        /* Pricing Cards Styling */
+        .pricing-card {
+            border: 2px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .pricing-card.featured {
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .pricing-card.featured:hover {
+            transform: scale(1.05) translateY(-5px);
+        }
+
+        .ribbon {
+            position: absolute;
+            top: 0;
+            right: 1rem;
+            background: var(--primary-color);
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 0 0 0.5rem 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        /* Form Controls */
+        .form-control, .form-select {
+            border-radius: 0.5rem;
+            padding: 0.75rem 1rem;
+            border: 1px solid #d1d3e2;
+            transition: all 0.2s;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
+
+        /* Badges and Buttons */
+        .badge {
+            padding: 0.5em 0.75em;
+            font-weight: 600;
+            border-radius: 0.35rem;
+        }
+
+        .btn {
+            border-radius: 0.5rem;
+            font-weight: 600;
+            padding: 0.5rem 1.25rem;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            .auth-card {
+                margin: 1rem;
+            }
+
+            .pricing-card.featured {
+                transform: none;
+            }
+
+            .pricing-card.featured:hover {
+                transform: translateY(-5px);
+            }
+        }
+
+        /* Feedback Form Styles */
+        .feedback-card {
+            border: none;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+            border-radius: 1rem;
+        }
+
+        .feedback-section {
+            padding: 1.5rem;
+            background: #f8f9fc;
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+        .feedback-section:hover {
+            background: #fff;
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
+        }
+
+        .rating-star {
+            color: #e9ecef;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .rating-star:hover,
+        .rating-star.active {
+            color: #ffc107;
+            transform: scale(1.1);
+        }
+
+        .feature-card {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            border-color: #4e73df;
+            transform: translateY(-2px);
+        }
+
+        .feature-checkbox {
+            display: none;
+        }
+
+        .feature-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            margin: 0;
+        }
+
+        .feature-checkbox:checked + .feature-label {
+            color: #4e73df;
+        }
+
+        .feature-label i {
+            font-size: 1.25rem;
+        }
+
+        .improvement-input textarea {
+            border-radius: 0.5rem;
+            border: 1px solid #e9ecef;
+            padding: 1rem;
+            resize: none;
+            transition: all 0.3s ease;
+        }
+
+        .improvement-input textarea:focus {
+            border-color: #4e73df;
+            box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+        }
+
+        .recommendation-buttons .btn {
+            padding: 0.75rem;
+            font-weight: 600;
+        }
+
+        .recommendation-buttons .btn i {
+            margin-right: 0.5rem;
+        }
+
+        .btn-check:checked + .btn-outline-success {
+            background-color: #1cc88a;
+            border-color: #1cc88a;
+        }
+
+        .btn-check:checked + .btn-outline-warning {
+            background-color: #f6c23e;
+            border-color: #f6c23e;
+        }
+
+        .btn-check:checked + .btn-outline-danger {
+            background-color: #e74a3b;
+            border-color: #e74a3b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Auth Pages -->
+    <div id="authPages" class="auth-container">
+        <!-- Login Page -->
+        <div id="loginPage" class="auth-page">
+            <div class="auth-card">
+                <div class="auth-card-header">
+                    <div class="site-logo">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Task Manager
+                    </div>
+                    <h4 class="mb-0">Welcome Back!</h4>
+                    <p class="text-muted">Sign in to continue your journey</p>
+                </div>
+                <div class="auth-card-body">
+                    <div id="loginAlertContainer"></div>
+                    <form id="loginForm" novalidate>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="loginEmail" placeholder="name@example.com" required>
+                            <label for="loginEmail">Email address</label>
+                            <div class="invalid-feedback">Please enter a valid email address.</div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="loginPassword" placeholder="Password" required>
+                            <label for="loginPassword">Password</label>
+                            <div class="invalid-feedback">Please enter your password.</div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <div class="form-check">
+                                <input type="checkbox" class="form-check-input" id="rememberMe">
+                                <label class="form-check-label" for="rememberMe">Remember me</label>
+                            </div>
+                            <a href="#" class="text-decoration-none forgot-link">Forgot password?</a>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" id="loginSubmitButton">
+                                <span class="btn-text">Sign In</span>
+                                <span class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
+            </button>
+                        </div>
+                    </form>
+                    <div class="text-center mt-4">
+                        <p class="mb-0">Don't have an account? <a href="#" onclick="showPage('registerPage')" class="text-decoration-none auth-link">Sign up</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Register Page -->
+        <div id="registerPage" class="auth-page d-none">
+            <div class="auth-card">
+                <div class="auth-card-header">
+                    <div class="site-logo">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Task Manager
+                    </div>
+                    <h4 class="mb-0">Create Account</h4>
+                    <p class="text-muted">Join us to get started</p>
+                </div>
+                <div class="auth-card-body">
+                    <div id="registerAlertContainer"></div>
+                    <form id="registerForm" novalidate>
+                        <div class="form-floating mb-3">
+                            <input type="text" class="form-control" id="fullName" placeholder="John Doe" required>
+                            <label for="fullName">Full Name</label>
+                            <div class="invalid-feedback">Please enter your full name.</div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="email" class="form-control" id="registerEmail" placeholder="name@example.com" required>
+                            <label for="registerEmail">Email address</label>
+                            <div class="invalid-feedback">Please enter a valid email address.</div>
+                        </div>
+                        <div class="form-floating mb-3">
+                            <input type="password" class="form-control" id="registerPassword" placeholder="Password" required>
+                            <label for="registerPassword">Password</label>
+                            <div class="invalid-feedback">Please enter a password.</div>
+                        </div>
+                        <div class="form-floating mb-4">
+                            <input type="password" class="form-control" id="confirmPassword" placeholder="Confirm Password" required>
+                            <label for="confirmPassword">Confirm Password</label>
+                            <div class="invalid-feedback">Passwords do not match.</div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary btn-lg" id="registerSubmitButton">
+                                <span class="btn-text">Create Account</span>
+                                <span class="spinner-border spinner-border-sm ms-2 d-none" role="status"></span>
+                            </button>
+                        </div>
+                    </form>
+                    <div class="text-center mt-4">
+                        <p class="mb-0">Already have an account? <a href="#" onclick="showPage('loginPage')" class="text-decoration-none auth-link">Sign in</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App Pages -->
+    <div id="appPages" class="d-none">
+        <div class="d-flex">
+            <!-- Sidebar Navigation -->
+            <nav class="bg-white shadow-sm p-3" style="min-width:200px;">
+                <h5>Menu</h5>
+                <ul class="nav flex-column">
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('dashboardPage')">Dashboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('tasksPage')">Tasks</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('calendarPage')">Calendar</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('trackPage')">Track</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('managePage')">Manage</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('leaderboardPage')">Leaderboard</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('rewardsPage')">Rewards</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('pricingPage')">Subscription</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('feedbackPage')">Feedback</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('aiAssistantPage')">AI Assistant</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="showPage('teamPage')">Team</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#" onclick="handleLogout()">Logout</a></li>
+                </ul>
+            </nav>
+
+            <!-- Main Content Area -->
+            <main class="flex-fill p-4">
+                <!-- Dashboard Page -->
+                <div id="dashboardPage" class="app-page">
+                    <div class="dashboard-header">
+                        <h2>Welcome Back!</h2>
+                        <p>Here's an overview of your tasks and progress</p>
+                                </div>
+                    
+                    <!-- Stats Cards -->
+                    <div class="row g-4 mb-4">
+                        <div class="col-md-3 col-sm-6">
+                            <div class="stats-card">
+                                <div class="icon-wrapper projects">
+                                    <i class="bi bi-folder-fill"></i>
+                            </div>
+                                <div class="stat-title">Total Projects</div>
+                                <div class="stat-value" id="totalProjects">0</div>
+                                <div class="stat-change positive">
+                                    <i class="bi bi-arrow-up"></i>
+                                    <span>12% from last month</span>
+                        </div>
+                                </div>
+                            </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="stats-card">
+                                <div class="icon-wrapper tasks">
+                                    <i class="bi bi-list-check"></i>
+                        </div>
+                                <div class="stat-title">Total Tasks</div>
+                                <div class="stat-value" id="totalTasks">0</div>
+                                <div class="stat-change positive">
+                                    <i class="bi bi-arrow-up"></i>
+                                    <span>8% from last month</span>
+                                </div>
+                            </div>
+                </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="stats-card">
+                                <div class="icon-wrapper completed">
+                                    <i class="bi bi-check-circle-fill"></i>
+                                </div>
+                                <div class="stat-title">Completed</div>
+                                <div class="stat-value" id="completedTasks">0</div>
+                                <div class="stat-change positive">
+                                    <i class="bi bi-arrow-up"></i>
+                                    <span>15% from last month</span>
+                            </div>
+                        </div>
+                    </div>
+                        <div class="col-md-3 col-sm-6">
+                            <div class="stats-card">
+                                <div class="icon-wrapper pending">
+                                    <i class="bi bi-clock-fill"></i>
+                                </div>
+                                <div class="stat-title">Pending</div>
+                                <div class="stat-value" id="pendingTasks">0</div>
+                                <div class="stat-change negative">
+                                    <i class="bi bi-arrow-down"></i>
+                                    <span>5% from last month</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Charts and Activity -->
+                    <div class="row g-4">
+                        <!-- Task Status Chart -->
+                        <div class="col-lg-8">
+                            <div class="chart-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title">Task Status Overview</h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-light btn-sm" type="button" data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item" href="#">This Week</a></li>
+                                            <li><a class="dropdown-item" href="#">This Month</a></li>
+                                            <li><a class="dropdown-item" href="#">This Year</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="taskChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Recent Activity -->
+                        <div class="col-lg-4">
+                            <div class="chart-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title">Recent Activity</h5>
+                                    <button class="btn btn-light btn-sm">
+                                        <i class="bi bi-arrow-clockwise"></i>
+                                    </button>
+                                </div>
+                                <ul class="activity-list">
+                                    <li class="activity-item">
+                                        <div class="activity-icon task-completed">
+                                            <i class="bi bi-check-lg"></i>
+                                        </div>
+                                        <div class="activity-content">
+                                            <div class="activity-title">Completed "Design Review"</div>
+                                            <div class="activity-time">2 hours ago</div>
+                                        </div>
+                                    </li>
+                                    <li class="activity-item">
+                                        <div class="activity-icon task-created">
+                                            <i class="bi bi-plus-lg"></i>
+                                        </div>
+                                        <div class="activity-content">
+                                            <div class="activity-title">Created "Team Meeting"</div>
+                                            <div class="activity-time">4 hours ago</div>
+                                        </div>
+                                    </li>
+                                    <li class="activity-item">
+                                        <div class="activity-icon task-overdue">
+                                            <i class="bi bi-exclamation-lg"></i>
+                                        </div>
+                                        <div class="activity-content">
+                                            <div class="activity-title">"Project Deadline" is overdue</div>
+                                            <div class="activity-time">1 day ago</div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Task Completion Trend -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="chart-card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title">Task Completion Trend</h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-light btn-sm" type="button" data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item" href="#">Daily</a></li>
+                                            <li><a class="dropdown-item" href="#">Weekly</a></li>
+                                            <li><a class="dropdown-item" href="#">Monthly</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="chart-container">
+                                    <canvas id="trendChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tasks Page -->
+                <div id="tasksPage" class="app-page d-none">
+                    <h2>Task Management</h2>
+                    <form id="taskForm" class="row g-3 mb-4">
+                        <div class="col-md-3">
+                            <input type="text" id="taskInput" class="form-control" placeholder="Task title..." required>
+                        </div>
+                        <div class="col-md-2">
+                            <input type="text" id="projectInput" class="form-control" placeholder="Project name" required>
+                        </div>
+                        <div class="col-md-2">
+                            <select id="priorityInput" class="form-select" required>
+                                <option value="">Select Priority</option>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select id="assignToInput" class="form-select" required>
+                                <option value="">Assign To</option>
+                                <option value="Mohd Zaheeruddin">Mohd Zaheeruddin</option>
+                                <option value="Shashank Anand Hadpad">Shashank Anand Hadpad</option>
+                                <option value="Nandini">Nandini</option>
+                                <option value="Nisarga">Nisarga</option>
+                                <option value="Sanjana Ambalgi">Sanjana Ambalgi</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <input type="date" id="dueDateInput" class="form-control" placeholder="Due Date">
+                        </div>
+                        <div class="col-12">
+                            <textarea id="descriptionInput" class="form-control" placeholder="Task description..." rows="2"></textarea>
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-plus-lg me-2"></i>Add Task
+                            </button>
+                        </div>
+                    </form>
+                    <div class="task-filters mb-3">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-outline-primary active" onclick="filterTasks('all')" id="filterAll">All Tasks</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="filterTasks('assigned')" id="filterAssigned">Assigned to Me</button>
+                            <button type="button" class="btn btn-outline-primary" onclick="filterTasks('created')" id="filterCreated">Created by Me</button>
+                        </div>
+                    </div>
+                    <ul id="taskList" class="list-group"></ul>
+                </div>
+
+                <!-- Leaderboard Page -->
+                <div id="leaderboardPage" class="app-page d-none">
+                    <h2>Leaderboard</h2>
+                    <div class="row mt-4">
+                        <div class="col-md-8 mx-auto">
+                            <!-- Top Performers -->
+                            <div class="row mb-4">
+                                <div class="col-md-4">
+                                    <div class="card text-center second-place">
+                                        <div class="card-body">
+                                            <div class="position-relative mb-3">
+                                                <i class="bi bi-trophy-fill text-warning fs-1"></i>
+                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">2</span>
+                                            </div>
+                                            <h5 class="card-title">Rahul Sharma</h5>
+                                            <p class="text-muted">Senior Developer</p>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-warning" style="width: 88%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card text-center first-place">
+                                        <div class="card-body">
+                                            <div class="position-relative mb-3">
+                                                <i class="bi bi-trophy-fill text-warning fs-1"></i>
+                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">1</span>
+                                            </div>
+                                            <h5 class="card-title">Priya Patel</h5>
+                                            <p class="text-muted">Project Lead</p>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-warning" style="width: 95%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card text-center third-place">
+                                        <div class="card-body">
+                                            <div class="position-relative mb-3">
+                                                <i class="bi bi-trophy-fill text-warning fs-1"></i>
+                                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">3</span>
+                                            </div>
+                                            <h5 class="card-title">Arjun Reddy</h5>
+                                            <p class="text-muted">Full Stack Developer</p>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-warning" style="width: 85%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Team Members List -->
+                            <div class="row mt-4">
+                                <div class="col-md-8 mx-auto">
+                        <div class="card">
+                                        <div class="card-header bg-white">
+                                            <h5 class="mb-0">Team Members</h5>
+                                        </div>
+                            <div class="card-body">
+                                            <div class="team-member-list">
+                                                <div class="team-member-item">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="member-rank me-3">
+                                                            <span class="rank-badge">4</span>
+                                                        </div>
+                                                        <div class="member-avatar me-3">
+                                                            <i class="bi bi-person-circle"></i>
+                                                        </div>
+                                                        <div class="member-info flex-grow-1">
+                                                            <h6 class="mb-0">Ananya Singh</h6>
+                                                            <p class="text-muted mb-0">UI/UX Designer</p>
+                                                        </div>
+                                                        <div class="member-stats text-end">
+                                                            <span class="badge bg-primary">82 Tasks</span>
+                                                            <span class="badge bg-info ms-2">820 Points</span>
+                                                            <span class="badge bg-success ms-2">14 Days Streak</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <div class="team-member-item">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="member-rank me-3">
+                                                            <span class="rank-badge">5</span>
+                                                        </div>
+                                                        <div class="member-avatar me-3">
+                                                            <i class="bi bi-person-circle"></i>
+                                                        </div>
+                                                        <div class="member-info flex-grow-1">
+                                                            <h6 class="mb-0">Vikram Malhotra</h6>
+                                                            <p class="text-muted mb-0">Backend Developer</p>
+                                                        </div>
+                                                        <div class="member-stats text-end">
+                                                            <span class="badge bg-primary">80 Tasks</span>
+                                                            <span class="badge bg-info ms-2">800 Points</span>
+                                                            <span class="badge bg-success ms-2">12 Days Streak</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <div class="team-member-item">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="member-rank me-3">
+                                                            <span class="rank-badge">6</span>
+                                                        </div>
+                                                        <div class="member-avatar me-3">
+                                                            <i class="bi bi-person-circle"></i>
+                                                        </div>
+                                                        <div class="member-info flex-grow-1">
+                                                            <h6 class="mb-0">Meera Kapoor</h6>
+                                                            <p class="text-muted mb-0">Frontend Developer</p>
+                                                        </div>
+                                                        <div class="member-stats text-end">
+                                                            <span class="badge bg-primary">78 Tasks</span>
+                                                            <span class="badge bg-info ms-2">780 Points</span>
+                                                            <span class="badge bg-success ms-2">11 Days Streak</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <div class="team-member-item">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="member-rank me-3">
+                                                            <span class="rank-badge">7</span>
+                                                        </div>
+                                                        <div class="member-avatar me-3">
+                                                            <i class="bi bi-person-circle"></i>
+                                                        </div>
+                                                        <div class="member-info flex-grow-1">
+                                                            <h6 class="mb-0">Rajesh Kumar</h6>
+                                                            <p class="text-muted mb-0">DevOps Engineer</p>
+                                                        </div>
+                                                        <div class="member-stats text-end">
+                                                            <span class="badge bg-primary">75 Tasks</span>
+                                                            <span class="badge bg-info ms-2">750 Points</span>
+                                                            <span class="badge bg-success ms-2">10 Days Streak</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <div class="team-member-item">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="member-rank me-3">
+                                                            <span class="rank-badge">8</span>
+                                                        </div>
+                                                        <div class="member-avatar me-3">
+                                                            <i class="bi bi-person-circle"></i>
+                                                        </div>
+                                                        <div class="member-info flex-grow-1">
+                                                            <h6 class="mb-0">Neha Gupta</h6>
+                                                            <p class="text-muted mb-0">QA Engineer</p>
+                                                        </div>
+                                                        <div class="member-stats text-end">
+                                                            <span class="badge bg-primary">72 Tasks</span>
+                                                            <span class="badge bg-info ms-2">720 Points</span>
+                                                            <span class="badge bg-success ms-2">9 Days Streak</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <div class="team-member-item">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="member-rank me-3">
+                                                            <span class="rank-badge">9</span>
+                                                        </div>
+                                                        <div class="member-avatar me-3">
+                                                            <i class="bi bi-person-circle"></i>
+                                                        </div>
+                                                        <div class="member-info flex-grow-1">
+                                                            <h6 class="mb-0">Amit Shah</h6>
+                                                            <p class="text-muted mb-0">Mobile Developer</p>
+                                                        </div>
+                                                        <div class="member-stats text-end">
+                                                            <span class="badge bg-primary">70 Tasks</span>
+                                                            <span class="badge bg-info ms-2">700 Points</span>
+                                                            <span class="badge bg-success ms-2">8 Days Streak</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <div class="team-member-item">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="member-rank me-3">
+                                                            <span class="rank-badge">10</span>
+                                                        </div>
+                                                        <div class="member-avatar me-3">
+                                                            <i class="bi bi-person-circle"></i>
+                                                        </div>
+                                                        <div class="member-info flex-grow-1">
+                                                            <h6 class="mb-0">Pooja Verma</h6>
+                                                            <p class="text-muted mb-0">Data Analyst</p>
+                                                        </div>
+                                                        <div class="member-stats text-end">
+                                                            <span class="badge bg-primary">68 Tasks</span>
+                                                            <span class="badge bg-info ms-2">680 Points</span>
+                                                            <span class="badge bg-success ms-2">7 Days Streak</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <div class="team-member-item">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="member-rank me-3">
+                                                            <span class="rank-badge">11</span>
+                                                        </div>
+                                                        <div class="member-avatar me-3">
+                                                            <i class="bi bi-person-circle"></i>
+                                                        </div>
+                                                        <div class="member-info flex-grow-1">
+                                                            <h6 class="mb-0">Karan Mehta</h6>
+                                                            <p class="text-muted mb-0">Security Engineer</p>
+                                                        </div>
+                                                        <div class="member-stats text-end">
+                                                            <span class="badge bg-primary">65 Tasks</span>
+                                                            <span class="badge bg-info ms-2">650 Points</span>
+                                                            <span class="badge bg-success ms-2">6 Days Streak</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <hr>
+                                                <div class="team-member-item">
+                                                    <div class="d-flex align-items-center">
+                                                        <div class="member-rank me-3">
+                                                            <span class="rank-badge">12</span>
+                                                        </div>
+                                                        <div class="member-avatar me-3">
+                                                            <i class="bi bi-person-circle"></i>
+                                                        </div>
+                                                        <div class="member-info flex-grow-1">
+                                                            <h6 class="mb-0">Divya Sharma</h6>
+                                                            <p class="text-muted mb-0">Product Manager</p>
+                                                        </div>
+                                                        <div class="member-stats text-end">
+                                                            <span class="badge bg-primary">62 Tasks</span>
+                                                            <span class="badge bg-info ms-2">620 Points</span>
+                                                            <span class="badge bg-success ms-2">5 Days Streak</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Team Page -->
+                <div id="teamPage" class="app-page d-none">
+                    <div class="team-header text-center mb-5">
+                        <div class="team-badge mb-3">HACKV10</div>
+                        <h2 class="team-name">Tensor Titans</h2>
+                        <p class="institution">Shetty Institute of Technology, Gulbarga</p>
+                        <div class="team-stats mt-4">
+                            <div class="row justify-content-center g-4">
+                                <div class="col-md-3 col-6">
+                                    <div class="stat-item">
+                                        <i class="bi bi-people-fill"></i>
+                                        <h3>5</h3>
+                                        <p>Team Members</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="stat-item">
+                                        <i class="bi bi-diagram-3-fill"></i>
+                                        <h3>2</h3>
+                                        <p>Specializations</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="stat-item">
+                                        <i class="bi bi-building"></i>
+                                        <h3>1</h3>
+                                        <p>Institution</p>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 col-6">
+                                    <div class="stat-item">
+                                        <i class="bi bi-trophy-fill"></i>
+                                        <h3>HACKV10</h3>
+                                        <p>Team Code</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row g-4">
+                        <!-- Team Members -->
+                        <div class="col-lg-4 col-md-6">
+                            <div class="team-card">
+                                <div class="team-card-inner">
+                                    <div class="team-avatar">
+                                        <div class="avatar-icon male">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                        <div class="role-badge">AI/ML Lead</div>
+                                    </div>
+                                    <div class="member-info">
+                                        <h5 class="card-title">Mohd Zaheeruddin</h5>
+                                        <div class="team-social">
+                                            <a href="#" class="social-link" title="LinkedIn">
+                                                <i class="bi bi-linkedin"></i>
+                                            </a>
+                                            <a href="#" class="social-link" title="GitHub">
+                                                <i class="bi bi-github"></i>
+                                            </a>
+                                            <a href="#" class="social-link" title="Email">
+                                                <i class="bi bi-envelope"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6">
+                            <div class="team-card">
+                                <div class="team-card-inner">
+                                    <div class="team-avatar">
+                                        <div class="avatar-icon male">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                        <div class="role-badge">Computer Science</div>
+                                    </div>
+                                    <div class="member-info">
+                                        <h5 class="card-title">Shashank Anand Hadpad</h5>
+                                        <div class="team-social">
+                                            <a href="#" class="social-link" title="LinkedIn">
+                                                <i class="bi bi-linkedin"></i>
+                                            </a>
+                                            <a href="#" class="social-link" title="GitHub">
+                                                <i class="bi bi-github"></i>
+                                            </a>
+                                            <a href="#" class="social-link" title="Email">
+                                                <i class="bi bi-envelope"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6">
+                            <div class="team-card">
+                                <div class="team-card-inner">
+                                    <div class="team-avatar">
+                                        <div class="avatar-icon female">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                        <div class="role-badge">Computer Science</div>
+                                    </div>
+                                    <div class="member-info">
+                                        <h5 class="card-title">Nandini</h5>
+                                        <div class="team-social">
+                                            <a href="#" class="social-link" title="LinkedIn">
+                                                <i class="bi bi-linkedin"></i>
+                                            </a>
+                                            <a href="#" class="social-link" title="GitHub">
+                                                <i class="bi bi-github"></i>
+                                            </a>
+                                            <a href="#" class="social-link" title="Email">
+                                                <i class="bi bi-envelope"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6">
+                            <div class="team-card">
+                                <div class="team-card-inner">
+                                    <div class="team-avatar">
+                                        <div class="avatar-icon female">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                        <div class="role-badge">Computer Science</div>
+                                    </div>
+                                    <div class="member-info">
+                                        <h5 class="card-title">Nisarga</h5>
+                                        <div class="team-social">
+                                            <a href="#" class="social-link" title="LinkedIn">
+                                                <i class="bi bi-linkedin"></i>
+                                            </a>
+                                            <a href="#" class="social-link" title="GitHub">
+                                                <i class="bi bi-github"></i>
+                                            </a>
+                                            <a href="#" class="social-link" title="Email">
+                                                <i class="bi bi-envelope"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 col-md-6">
+                            <div class="team-card">
+                                <div class="team-card-inner">
+                                    <div class="team-avatar">
+                                        <div class="avatar-icon female">
+                                            <i class="bi bi-person-fill"></i>
+                                        </div>
+                                        <div class="role-badge">Computer Science</div>
+                                    </div>
+                                    <div class="member-info">
+                                        <h5 class="card-title">Sanjana Ambalgi</h5>
+                                        <div class="team-social">
+                                            <a href="#" class="social-link" title="LinkedIn">
+                                                <i class="bi bi-linkedin"></i>
+                                            </a>
+                                            <a href="#" class="social-link" title="GitHub">
+                                                <i class="bi bi-github"></i>
+                                            </a>
+                                            <a href="#" class="social-link" title="Email">
+                                                <i class="bi bi-envelope"></i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Subscription Page -->
+                <div id="pricingPage" class="app-page d-none">
+                    <h2>Choose Your Plan</h2>
+                    <div class="row g-4 mt-3">
+                        <!-- Free Plan -->
+                        <div class="col-md-4">
+                            <div class="card h-100 pricing-card">
+                                <div class="card-body text-center">
+                                    <h3 class="card-title">Free</h3>
+                                    <div class="price mb-4">
+                                        <span class="display-4">₹0</span>
+                                        <span class="text-muted">/forever</span>
+                                    </div>
+                                    <ul class="list-unstyled mb-4">
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>5 tasks/day</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Weekly summary</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>1 user only</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Community support</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Up to 3 reminders/day</li>
+                                    </ul>
+                                    <button class="btn btn-outline-primary w-100">Current Plan</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Pro Plan -->
+                        <div class="col-md-4">
+                            <div class="card h-100 pricing-card featured">
+                                <div class="card-body text-center">
+                                    <div class="ribbon">Popular</div>
+                                    <h3 class="card-title">Pro</h3>
+                                    <div class="price mb-4">
+                                        <span class="display-4">₹699</span>
+                                        <span class="text-muted">/6 months</span>
+                                    </div>
+                                    <ul class="list-unstyled mb-4">
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Unlimited tasks + smart sorting</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Daily productivity reports</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>1 user</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Priority email/chat support</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Unlimited + recurring reminders</li>
+                                    </ul>
+                                    <button class="btn btn-primary w-100" onclick="window.location.href='subscription.html'">Upgrade to Pro</button>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Business Plan -->
+                        <div class="col-md-4">
+                            <div class="card h-100 pricing-card">
+                                <div class="card-body text-center">
+                                    <h3 class="card-title">Business</h3>
+                                    <div class="price mb-4">
+                                        <span class="display-4">₹1999</span>
+                                        <span class="text-muted">/6 months</span>
+                                    </div>
+                                    <ul class="list-unstyled mb-4">
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Task assignment, project boards, progress sync</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Org-level analytics + member reports</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Up to 50 users/team</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Dedicated account manager + SLA support</li>
+                                        <li class="mb-2"><i class="bi bi-check-circle-fill text-success me-2"></i>Team calendar integration + shared events</li>
+                                    </ul>
+                                    <button class="btn btn-outline-primary w-100">Contact Sales</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Feedback Page -->
+                <div id="feedbackPage" class="app-page d-none">
+                    <h2>Share Your Feedback</h2>
+                    <div class="row mt-4">
+                        <div class="col-md-8 mx-auto">
+                            <div class="card feedback-card">
+                                <div class="card-body">
+                                    <form id="feedbackForm">
+                                        <!-- Rating Section -->
+                                        <div class="feedback-section mb-4">
+                                            <label class="form-label fw-bold">How would you rate your experience?</label>
+                                            <div class="rating-container text-center my-3">
+                                                <div class="rating-stars d-flex justify-content-center gap-2">
+                                                    <i class="bi bi-star fs-1 rating-star" data-rating="1"></i>
+                                                    <i class="bi bi-star fs-1 rating-star" data-rating="2"></i>
+                                                    <i class="bi bi-star fs-1 rating-star" data-rating="3"></i>
+                                                    <i class="bi bi-star fs-1 rating-star" data-rating="4"></i>
+                                                    <i class="bi bi-star fs-1 rating-star" data-rating="5"></i>
+                                            </div>
+                                                <div class="rating-text mt-2 text-muted">Click to rate</div>
+                                        </div>
+                                        </div>
+
+                                        <!-- Liked Features Section -->
+                                        <div class="feedback-section mb-4">
+                                            <label class="form-label fw-bold">What aspects do you like?</label>
+                                            <div class="row g-3 mt-2">
+                                                <div class="col-md-4">
+                                                    <div class="feature-card">
+                                                        <input class="feature-checkbox" type="checkbox" value="ui" id="likeUI">
+                                                        <label class="feature-label" for="likeUI">
+                                                            <i class="bi bi-palette-fill"></i>
+                                                            <span>User Interface</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="feature-card">
+                                                        <input class="feature-checkbox" type="checkbox" value="features" id="likeFeatures">
+                                                        <label class="feature-label" for="likeFeatures">
+                                                            <i class="bi bi-gear-fill"></i>
+                                                            <span>Features</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="feature-card">
+                                                        <input class="feature-checkbox" type="checkbox" value="performance" id="likePerformance">
+                                                        <label class="feature-label" for="likePerformance">
+                                                            <i class="bi bi-speedometer2"></i>
+                                                            <span>Performance</span>
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Improvement Section -->
+                                        <div class="feedback-section mb-4">
+                                            <label class="form-label fw-bold">What could be improved?</label>
+                                            <div class="improvement-input mt-2">
+                                                <textarea class="form-control" rows="3" placeholder="Share your suggestions..." id="improvementText"></textarea>
+                                                <div class="character-count mt-1 text-end text-muted">
+                                                    <span id="charCount">0</span>/500 characters
+                                        </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- Recommendation Section -->
+                                        <div class="feedback-section mb-4">
+                                            <label class="form-label fw-bold">Would you recommend us to others?</label>
+                                            <div class="recommendation-buttons mt-3">
+                                            <div class="btn-group w-100" role="group">
+                                                <input type="radio" class="btn-check" name="recommend" id="recommendYes" value="yes">
+                                                    <label class="btn btn-outline-success" for="recommendYes">
+                                                        <i class="bi bi-hand-thumbs-up-fill"></i>
+                                                        Yes
+                                                    </label>
+                                                <input type="radio" class="btn-check" name="recommend" id="recommendMaybe" value="maybe">
+                                                    <label class="btn btn-outline-warning" for="recommendMaybe">
+                                                        <i class="bi bi-question-circle-fill"></i>
+                                                        Maybe
+                                                    </label>
+                                                <input type="radio" class="btn-check" name="recommend" id="recommendNo" value="no">
+                                                    <label class="btn btn-outline-danger" for="recommendNo">
+                                                        <i class="bi bi-hand-thumbs-down-fill"></i>
+                                                        No
+                                                    </label>
+            </div>
+        </div>
+                                        </div>
+
+                                        <!-- Submit Button -->
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-primary btn-lg">
+                                                <i class="bi bi-send-fill me-2"></i>
+                                                Submit Feedback
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Assistant Page -->
+                <div id="aiAssistantPage" class="app-page d-none">
+                    <h2>AI Assistant</h2>
+                    <div class="row mt-4">
+                        <div class="col-md-8 mx-auto">
+                            <!-- Chat Interface -->
+                            <div class="card chat-container">
+                                <div class="card-header bg-white">
+                                    <div class="d-flex align-items-center">
+                                        <div class="ai-avatar me-3">
+                                            <i class="bi bi-robot"></i>
+                                        </div>
+                                        <div>
+                                            <h5 class="mb-0">Task Assistant</h5>
+                                            <small class="text-muted">Online</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="card-body chat-messages" id="chatMessages">
+                                    <div class="message ai-message">
+                                        <div class="message-content">
+                                            <p>Hello! I'm your AI assistant. How can I help you today?</p>
+                                        </div>
+                                        <small class="text-muted">Just now</small>
+                                    </div>
+                                </div>
+                                <div class="card-footer bg-white">
+                                    <form id="aiChatForm" class="d-flex">
+                                        <input type="text" class="form-control me-2" placeholder="Type your message..." id="aiMessageInput">
+                                        <button type="submit" class="btn btn-primary">
+                                            <i class="bi bi-send"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <!-- Quick Actions -->
+                            <div class="row mt-4">
+                                <div class="col-md-4">
+                                    <div class="card quick-action-card">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-calendar-check fs-1 text-primary mb-3"></i>
+                                            <h5>Schedule Tasks</h5>
+                                            <p class="text-muted">Let AI help you plan your day</p>
+                                            <button class="btn btn-outline-primary" onclick="handleQuickAction('schedule')">Try Now</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card quick-action-card">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-lightbulb fs-1 text-primary mb-3"></i>
+                                            <h5>Task Suggestions</h5>
+                                            <p class="text-muted">Get AI-powered task recommendations</p>
+                                            <button class="btn btn-outline-primary" onclick="handleQuickAction('suggest')">Try Now</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="card quick-action-card">
+                                        <div class="card-body text-center">
+                                            <i class="bi bi-graph-up fs-1 text-primary mb-3"></i>
+                                            <h5>Productivity Tips</h5>
+                                            <p class="text-muted">Get personalized productivity advice</p>
+                                            <button class="btn btn-outline-primary" onclick="handleQuickAction('tips')">Try Now</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Suggestions Section -->
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title mb-4">Suggested Questions</h5>
+                                            <div class="suggested-questions">
+                                                <div class="row g-3">
+                                                    <div class="col-md-6">
+                                                        <div class="suggestion-card" onclick="askQuestion('How can I improve my task completion rate?')">
+                                                            <i class="bi bi-speedometer2"></i>
+                                                            <span>How can I improve my task completion rate?</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="suggestion-card" onclick="askQuestion('What are the best practices for task prioritization?')">
+                                                            <i class="bi bi-list-check"></i>
+                                                            <span>What are the best practices for task prioritization?</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="suggestion-card" onclick="askQuestion('How do I manage team deadlines effectively?')">
+                                                            <i class="bi bi-people"></i>
+                                                            <span>How do I manage team deadlines effectively?</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        <div class="suggestion-card" onclick="askQuestion('What are some tips for maintaining a good streak?')">
+                                                            <i class="bi bi-fire"></i>
+                                                            <span>What are some tips for maintaining a good streak?</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Sample Responses -->
+                            <div class="row mt-4">
+                                <div class="col-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <h5 class="card-title mb-4">Sample Responses</h5>
+                                            <div class="sample-responses">
+                                                <div class="response-item">
+                                                    <h6>User: How can I improve my task completion rate?</h6>
+                                                    <p class="response">Here are some tips to improve your task completion rate:
+                                                        1. Break down large tasks into smaller, manageable subtasks
+                                                        2. Set realistic deadlines and stick to them
+                                                        3. Use the priority system to focus on important tasks
+                                                        4. Take advantage of daily challenges for bonus points
+                                                        5. Review your progress regularly on the dashboard</p>
+                                                </div>
+                                                <div class="response-item">
+                                                    <h6>User: What are the best practices for task prioritization?</h6>
+                                                    <p class="response">Effective task prioritization involves:
+                                                        1. Categorize tasks by urgency and importance
+                                                        2. Use the priority levels (Low, Medium, High, Urgent)
+                                                        3. Consider deadlines and dependencies
+                                                        4. Review and adjust priorities daily
+                                                        5. Focus on high-impact tasks first</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Rewards Page -->
+                <div id="rewardsPage" class="app-page d-none">
+                    <h2>Rewards & Achievements</h2>
+                    <div class="row mt-4">
+                        <!-- Points Summary -->
+                        <div class="col-md-4">
+                            <div class="card rewards-card">
+                                <div class="card-body text-center">
+                                    <div class="points-circle mb-3">
+                                        <span class="points-number">1,250</span>
+                                        <span class="points-label">Points</span>
+                                    </div>
+                                    <h5>Your Points</h5>
+                                    <div class="progress mt-3">
+                                        <div class="progress-bar bg-success" style="width: 75%"></div>
+                                    </div>
+                                    <p class="text-muted mt-2">250 points until next level</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Achievements -->
+                        <div class="col-md-8">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-4">Achievements</h5>
+                                    <div class="row g-3">
+                                        <div class="col-md-4">
+                                            <div class="achievement-card unlocked">
+                                                <i class="bi bi-trophy-fill"></i>
+                                                <h6>Task Master</h6>
+                                                <p>Complete 50 tasks</p>
+                                                <div class="progress">
+                                                    <div class="progress-bar" style="width: 100%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="achievement-card unlocked">
+                                                <i class="bi bi-lightning-fill"></i>
+                                                <h6>Speed Demon</h6>
+                                                <p>Complete 5 tasks in one day</p>
+                                                <div class="progress">
+                                                    <div class="progress-bar" style="width: 100%"></div>
+                                                </div>
+                </div>
+                </div>
+                <div class="col-md-4">
+                                            <div class="achievement-card locked">
+                                                <i class="bi bi-star-fill"></i>
+                                                <h6>Perfect Week</h6>
+                                                <p>Complete all tasks for 7 days</p>
+                                                <div class="progress">
+                                                    <div class="progress-bar" style="width: 60%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Available Rewards -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-4">Available Rewards</h5>
+                                    <div class="row g-3">
+                                        <div class="col-md-3">
+                                            <div class="reward-card">
+                                                <div class="reward-icon">
+                                                    <i class="bi bi-gift-fill"></i>
+                                                </div>
+                                                <h6>Premium Week</h6>
+                                                <p class="text-muted">1 week of premium features</p>
+                                                <button class="btn btn-primary btn-sm w-100">Redeem (500 pts)</button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="reward-card">
+                                                <div class="reward-icon">
+                                                    <i class="bi bi-palette-fill"></i>
+                                                </div>
+                                                <h6>Custom Theme</h6>
+                                                <p class="text-muted">Unlock custom app theme</p>
+                                                <button class="btn btn-primary btn-sm w-100">Redeem (300 pts)</button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="reward-card">
+                                                <div class="reward-icon">
+                                                    <i class="bi bi-emoji-smile-fill"></i>
+                                                </div>
+                                                <h6>Custom Avatar</h6>
+                                                <p class="text-muted">Unlock premium avatars</p>
+                                                <button class="btn btn-primary btn-sm w-100">Redeem (200 pts)</button>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3">
+                                            <div class="reward-card">
+                                                <div class="reward-icon">
+                                                    <i class="bi bi-badge-check"></i>
+                                                </div>
+                                                <h6>Verified Badge</h6>
+                                                <p class="text-muted">Get a verified badge</p>
+                                                <button class="btn btn-primary btn-sm w-100">Redeem (100 pts)</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar Page -->
+                <div id="calendarPage" class="app-page d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="mb-0">Calendar & Upcoming Tasks</h2>
+                        <button class="btn btn-primary" onclick="showPage('tasksPage')">
+                            <i class="bi bi-plus-lg me-2"></i>Add New Task
+                        </button>
+                    </div>
+                    <div class="row g-4">
+                        <!-- Calendar View -->
+                        <div class="col-lg-8">
+                            <div class="calendar-container">
+                                <div class="calendar-header">
+                                    <div class="calendar-nav">
+                                        <button onclick="previousMonth()" class="btn btn-light">
+                                            <i class="bi bi-chevron-left"></i>
+                                        </button>
+                                        <span class="current-month" id="currentMonthDisplay"></span>
+                                        <button onclick="nextMonth()" class="btn btn-light">
+                                            <i class="bi bi-chevron-right"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="calendar-weekdays">
+                                    <div class="calendar-weekday">Sun</div>
+                                    <div class="calendar-weekday">Mon</div>
+                                    <div class="calendar-weekday">Tue</div>
+                                    <div class="calendar-weekday">Wed</div>
+                                    <div class="calendar-weekday">Thu</div>
+                                    <div class="calendar-weekday">Fri</div>
+                                    <div class="calendar-weekday">Sat</div>
+                                </div>
+                                <div id="calendar" class="calendar-grid"></div>
+                            </div>
+                        </div>
+                        
+                        <!-- Upcoming Tasks -->
+                        <div class="col-lg-4">
+                            <div class="card h-100 upcoming-tasks-card">
+                                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Upcoming Tasks</h5>
+                                    <div class="dropdown">
+                                        <button class="btn btn-light btn-sm" type="button" data-bs-toggle="dropdown">
+                                            <i class="bi bi-three-dots-vertical"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li><a class="dropdown-item" href="#" onclick="filterUpcomingTasks('all')">All Tasks</a></li>
+                                            <li><a class="dropdown-item" href="#" onclick="filterUpcomingTasks('assigned')">Assigned to Me</a></li>
+                                            <li><a class="dropdown-item" href="#" onclick="filterUpcomingTasks('today')">Today</a></li>
+                                            <li><a class="dropdown-item" href="#" onclick="filterUpcomingTasks('week')">This Week</a></li>
+                                            <li><a class="dropdown-item" href="#" onclick="filterUpcomingTasks('overdue')">Overdue</a></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <div id="upcomingTasks" class="upcoming-tasks">
+                                        <!-- Tasks will be populated here -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Track Page -->
+                <div id="trackPage" class="app-page d-none">
+                    <h2>Task Tracking</h2>
+                    <div class="row g-4 mt-3">
+                        <!-- Progress Overview -->
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header bg-white">
+                                    <h5 class="card-title mb-0">Progress Overview</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="progress-stats">
+                                        <div class="progress-item mb-4">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Daily Progress</span>
+                                                <span class="text-primary">75%</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-primary" style="width: 75%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="progress-item mb-4">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Weekly Goals</span>
+                                                <span class="text-success">60%</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-success" style="width: 60%"></div>
+                                            </div>
+                                        </div>
+                                        <div class="progress-item">
+                                            <div class="d-flex justify-content-between mb-2">
+                                                <span>Monthly Targets</span>
+                                                <span class="text-info">45%</span>
+                                            </div>
+                                            <div class="progress">
+                                                <div class="progress-bar bg-info" style="width: 45%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Time Tracking -->
+                        <div class="col-md-6">
+                            <div class="card h-100">
+                                <div class="card-header bg-white">
+                                    <h5 class="card-title mb-0">Time Tracking</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="time-tracking">
+                                        <div class="current-task mb-4">
+                                            <h6>Current Task</h6>
+                                            <div class="d-flex align-items-center">
+                                                <div class="task-timer me-3">
+                                                    <span class="display-6" id="timerDisplay">00:00:00</span>
+                                                </div>
+                                                <div class="task-controls">
+                                                    <button class="btn btn-primary btn-sm me-2" id="startTimerBtn" onclick="startTimer()">
+                                                        <i class="bi bi-play-fill"></i>
+                                                    </button>
+                                                    <button class="btn btn-primary btn-sm me-2 d-none" id="pauseTimerBtn" onclick="pauseTimer()">
+                                                        <i class="bi bi-pause-fill"></i>
+                                                    </button>
+                                                    <button class="btn btn-danger btn-sm" onclick="stopTimer()">
+                                                        <i class="bi bi-stop-fill"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="time-breakdown">
+                                            <h6>Today's Time Breakdown</h6>
+                                            <div class="time-chart">
+                                                <canvas id="timeChart"></canvas>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Task Analytics -->
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="card-title mb-0">Task Analytics</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-4">
+                                            <div class="analytics-card text-center p-4">
+                                                <i class="bi bi-clock-history fs-1 text-primary mb-3"></i>
+                                                <h3>4.5 hrs</h3>
+                                                <p class="text-muted">Average Task Duration</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="analytics-card text-center p-4">
+                                                <i class="bi bi-check-circle fs-1 text-success mb-3"></i>
+                                                <h3>85%</h3>
+                                                <p class="text-muted">Completion Rate</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4">
+                                            <div class="analytics-card text-center p-4">
+                                                <i class="bi bi-graph-up fs-1 text-info mb-3"></i>
+                                                <h3>12%</h3>
+                                                <p class="text-muted">Productivity Increase</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Manage Page -->
+                <div id="managePage" class="app-page d-none">
+                    <h2>Task Management</h2>
+                    <div class="row g-4 mt-3">
+                        <!-- Task Categories -->
+                        <div class="col-md-4">
+                            <div class="card h-100">
+                                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Categories</h5>
+                                    <div class="d-flex gap-2">
+                                        <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                                            <i class="bi bi-plus-lg"></i>
+                                        </button>
+                                        <button class="btn btn-outline-primary btn-sm" onclick="toggleCategoryView()">
+                                            <i class="bi bi-grid-3x3-gap"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-body">
+                                    <!-- Category Stats -->
+                                    <div class="category-stats mb-4">
+                                        <div class="row g-2">
+                                            <div class="col-6">
+                                                <div class="stat-card bg-primary bg-opacity-10 p-2 rounded">
+                                                    <small class="text-primary">Total Categories</small>
+                                                    <h4 class="mb-0" id="totalCategories">0</h4>
+                                                </div>
+                                            </div>
+                                            <div class="col-6">
+                                                <div class="stat-card bg-info bg-opacity-10 p-2 rounded">
+                                                    <small class="text-info">Active Tasks</small>
+                                                    <h4 class="mb-0" id="activeTasks">25</h4>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Category List View -->
+                                    <div class="category-list" id="categoryListView">
+                                        <!-- Categories will be populated here -->
+                                    </div>
+
+                                    <!-- Category Grid View -->
+                                    <div class="category-grid d-none" id="categoryGridView">
+                                        <!-- Grid view will be populated here -->
+                                    </div>
+
+                                    <!-- Category Progress -->
+                                    <div class="category-progress mt-4">
+                                        <h6 class="mb-3">Category Progress</h6>
+                                        <div id="categoryProgressList">
+                                            <!-- Progress bars will be populated here -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Add Category Modal -->
+                        <div class="modal fade" id="addCategoryModal" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Add New Category</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form id="categoryForm">
+                                            <div class="mb-3">
+                                                <label class="form-label">Category Name</label>
+                                                <input type="text" class="form-control" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Color</label>
+                                                <div class="color-picker d-flex gap-2">
+                                                    <input type="color" class="form-control form-control-color" value="#4e73df">
+                                                    <div class="color-presets d-flex gap-2">
+                                                        <button type="button" class="btn btn-sm" style="background-color: #4e73df" onclick="setCategoryColor('#4e73df')"></button>
+                                                        <button type="button" class="btn btn-sm" style="background-color: #1cc88a" onclick="setCategoryColor('#1cc88a')"></button>
+                                                        <button type="button" class="btn btn-sm" style="background-color: #36b9cc" onclick="setCategoryColor('#36b9cc')"></button>
+                                                        <button type="button" class="btn btn-sm" style="background-color: #f6c23e" onclick="setCategoryColor('#f6c23e')"></button>
+                                                        <button type="button" class="btn btn-sm" style="background-color: #e74a3b" onclick="setCategoryColor('#e74a3b')"></button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label class="form-label">Icon</label>
+                                                <div class="icon-picker d-flex gap-2">
+                                                    <button type="button" class="btn btn-outline-primary" onclick="setCategoryIcon('bi-folder')">
+                                                        <i class="bi bi-folder"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" onclick="setCategoryIcon('bi-code-square')">
+                                                        <i class="bi bi-code-square"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" onclick="setCategoryIcon('bi-palette')">
+                                                        <i class="bi bi-palette"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" onclick="setCategoryIcon('bi-bullhorn')">
+                                                        <i class="bi bi-bullhorn"></i>
+                                                    </button>
+                                                    <button type="button" class="btn btn-outline-primary" onclick="setCategoryIcon('bi-graph-up')">
+                                                        <i class="bi bi-graph-up"></i>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <button type="button" class="btn btn-primary" onclick="submitCategory()">Add Category</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Task Templates -->
+                        <div class="col-md-8">
+                            <div class="card h-100">
+                                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                                    <h5 class="card-title mb-0">Task Templates</h5>
+                                    <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addTemplateModal">
+                                        <i class="bi bi-plus-lg"></i>
+                                    </button>
+                                </div>
+                                <div class="card-body">
+                                    <div class="template-list">
+                                        <div class="template-item p-3 mb-3 border rounded">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="mb-0">Bug Fix Template</h6>
+                                                <div class="template-actions">
+                                                    <button class="btn btn-sm btn-outline-primary me-2">Use</button>
+                                                    <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                                                </div>
+                                            </div>
+                                            <p class="text-muted mb-0">Standard template for bug fixes with steps and checklist</p>
+                                        </div>
+                                        <div class="template-item p-3 mb-3 border rounded">
+                                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                                <h6 class="mb-0">Feature Development</h6>
+                                                <div class="template-actions">
+                                                    <button class="btn btn-sm btn-outline-primary me-2">Use</button>
+                                                    <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                                                </div>
+                                            </div>
+                                            <p class="text-muted mb-0">Template for new feature development workflow</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Task Dependencies -->
+                        <div class="col-12">
+                            <div class="card">
+                                <div class="card-header bg-white">
+                                    <h5 class="card-title mb-0">Task Dependencies</h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="dependency-graph">
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="dependency-item p-3 border rounded mb-3">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <h6 class="mb-1">Frontend Development</h6>
+                                                            <p class="text-muted mb-0">Depends on: Design Approval</p>
+                                                        </div>
+                                                        <span class="badge bg-warning">Pending</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="dependency-item p-3 border rounded mb-3">
+                                                    <div class="d-flex justify-content-between align-items-center">
+                                                        <div>
+                                                            <h6 class="mb-1">API Integration</h6>
+                                                            <p class="text-muted mb-0">Depends on: Backend Development</p>
+                                                        </div>
+                                                        <span class="badge bg-success">Completed</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="js/app.js"></script>
+    <script>
+        // Global Variables
+        let currentUser = 'Mohd Zaheeruddin';
+        let tasks = []; // Initialize empty tasks array
+        let currentFilter = 'all';
+        let currentView = 'list';
+        let selectedIcon = 'bi-folder';
+        let timerInterval = null;
+        let seconds = 0;
+        let isTimerRunning = false;
+        let taskChart;
+        let trendChart;
+
+        // Initialize task charts
+        function initCharts() {
+            // Task Status Chart
+            const taskCtx = document.getElementById('taskChart').getContext('2d');
+            taskChart = new Chart(taskCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Completed', 'Active'],
+                    datasets: [{
+                        data: [0, 0],
+                        backgroundColor: [
+                            'rgba(28, 200, 138, 0.8)',
+                            'rgba(78, 115, 223, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(28, 200, 138, 1)',
+                            'rgba(78, 115, 223, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 0 // Disable animation for immediate updates
+                    }
+                }
+            });
+
+            // Task Completion Trend Chart
+            const trendCtx = document.getElementById('trendChart').getContext('2d');
+            trendChart = new Chart(trendCtx, {
+                type: 'line',
+                data: {
+                    labels: getLast7Days(),
+                    datasets: [{
+                        label: 'Completed Tasks',
+                        data: [0, 0, 0, 0, 0, 0, 0],
+                        borderColor: 'rgba(28, 200, 138, 1)',
+                        backgroundColor: 'rgba(28, 200, 138, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 0 // Disable animation for immediate updates
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Get last 7 days for trend chart
+        function getLast7Days() {
+            const dates = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                dates.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+            }
+            return dates;
+        }
+
+        // Function to update all UI elements
+        function updateAllUI() {
+            const completedTasks = tasks.filter(task => task.completed).length;
+            const activeTasks = tasks.filter(task => !task.completed).length;
+            
+            // Update task counts immediately
+            document.getElementById('totalTasks').textContent = tasks.length;
+            document.getElementById('completedTasks').textContent = completedTasks;
+            document.getElementById('pendingTasks').textContent = activeTasks;
+            
+            // Update task status chart immediately
+            if (taskChart) {
+                taskChart.data.datasets[0].data = [completedTasks, activeTasks];
+                taskChart.update('none'); // Use 'none' for immediate update
+            }
+            
+            // Update trend chart immediately
+            if (trendChart) {
+                const last7DaysData = getLast7DaysData();
+                trendChart.data.datasets[0].data = last7DaysData;
+                trendChart.update('none'); // Use 'none' for immediate update
+            }
+            
+            // Update task list
+            updateTaskList();
+        }
+
+        // Get completion data for last 7 days
+        function getLast7DaysData() {
+            const data = [0, 0, 0, 0, 0, 0, 0];
+            const today = new Date();
+            
+            tasks.forEach(task => {
+                if (task.completed && task.completedAt) {
+                    const completedDate = new Date(task.completedAt);
+                    const diffDays = Math.floor((today - completedDate) / (1000 * 60 * 60 * 24));
+                    if (diffDays >= 0 && diffDays < 7) {
+                        data[6 - diffDays]++;
+                    }
+                }
+            });
+            
+            return data;
+        }
+
+        // Function to update task list
+        function updateTaskList() {
+            const taskList = document.getElementById('taskList');
+            taskList.innerHTML = '';
+            
+            tasks.forEach(task => {
+                const taskItem = document.createElement('div');
+                taskItem.className = 'list-group-item';
+                taskItem.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div class="form-check">
+                            <input class="form-check-input task-checkbox" type="checkbox" 
+                                id="task${task.id}" ${task.completed ? 'checked' : ''}>
+                            <label class="form-check-label ${task.completed ? 'text-decoration-line-through' : ''}" 
+                                for="task${task.id}">
+                                ${task.title}
+                            </label>
+                        </div>
+                        <div class="d-flex align-items-center">
+                            <div class="task-meta me-3">
+                                <span class="badge bg-${task.priority === 'high' ? 'danger' : task.priority === 'medium' ? 'warning' : 'info'} me-2">
+                                    ${task.priority}
+                                </span>
+                                <small class="text-muted">Due: ${task.dueDate}</small>
+                            </div>
+                            <button class="btn btn-danger btn-sm delete-task" data-task-id="${task.id}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Add event listener for checkbox
+                const checkbox = taskItem.querySelector('.task-checkbox');
+                checkbox.addEventListener('change', function() {
+                    task.completed = this.checked;
+                    task.completedAt = task.completed ? new Date().toISOString() : null;
+                    const label = this.nextElementSibling;
+                    if (task.completed) {
+                        label.classList.add('text-decoration-line-through');
+                    } else {
+                        label.classList.remove('text-decoration-line-through');
+                    }
+                    
+                    // Update all UI elements immediately
+                    updateAllUI();
+                });
+
+                // Add event listener for delete button
+                const deleteBtn = taskItem.querySelector('.delete-task');
+                deleteBtn.addEventListener('click', function() {
+                    const taskId = parseInt(this.dataset.taskId);
+                    tasks = tasks.filter(t => t.id !== taskId);
+                    updateAllUI();
+                });
+                
+                taskList.appendChild(taskItem);
+            });
+        }
+
+        // Initialize everything when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Clear any existing tasks
+            tasks = [];
+            
+            // Initialize charts and UI
+            initCharts();
+            updateAllUI();
+
+            // Add event listener for task form submission
+            const taskForm = document.getElementById('taskForm');
+            taskForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const taskTitle = document.getElementById('taskInput').value.trim();
+                const projectName = document.getElementById('projectInput').value.trim();
+                const priority = document.getElementById('priorityInput').value;
+                const assignedTo = document.getElementById('assignToInput').value;
+                const dueDate = document.getElementById('dueDateInput').value;
+                const description = document.getElementById('descriptionInput').value.trim();
+
+                // Only create task if title is not empty and not one of the predefined tasks
+                if (taskTitle && !isPredefinedTask(taskTitle)) {
+                    const newTask = {
+                        id: Date.now(),
+                        title: taskTitle,
+                        project: projectName,
+                        priority: priority,
+                        assignedTo: assignedTo,
+                        dueDate: dueDate,
+                        description: description,
+                        completed: false,
+                        completedAt: null,
+                        createdAt: new Date().toISOString(),
+                        createdBy: currentUser
+                    };
+
+                    tasks.push(newTask);
+                    updateAllUI();
+                    this.reset();
+                }
+            });
+        });
+
+        // Function to check if a task is one of the predefined tasks
+        function isPredefinedTask(taskTitle) {
+            const predefinedTasks = [
+                'Complete project proposal',
+                'Review code changes',
+                'Update documentation'
+            ];
+            return predefinedTasks.includes(taskTitle);
+        }
+
+        // Remove any duplicate event listeners and initialization code
+        document.addEventListener('DOMContentLoaded', function() {
+            // Clear any existing tasks
+            tasks = [];
+            
+            // Initialize charts and UI
+            initCharts();
+            updateAllUI();
+        });
+
+        // Timer Functions
+        function startTimer() {
+            if (!isTimerRunning) {
+                isTimerRunning = true;
+                timerInterval = setInterval(updateTimer, 1000);
+                document.getElementById('startTimerBtn').classList.add('d-none');
+                document.getElementById('pauseTimerBtn').classList.remove('d-none');
+            }
+        }
+
+        function pauseTimer() {
+            if (isTimerRunning) {
+                isTimerRunning = false;
+                clearInterval(timerInterval);
+                document.getElementById('startTimerBtn').classList.remove('d-none');
+                document.getElementById('pauseTimerBtn').classList.add('d-none');
+            }
+        }
+
+        function stopTimer() {
+            isTimerRunning = false;
+            clearInterval(timerInterval);
+            seconds = 0;
+            updateTimerDisplay();
+            document.getElementById('startTimerBtn').classList.remove('d-none');
+            document.getElementById('pauseTimerBtn').classList.add('d-none');
+        }
+
+        function updateTimer() {
+            seconds++;
+            updateTimerDisplay();
+        }
+
+        function updateTimerDisplay() {
+            const hours = Math.floor(seconds / 3600);
+            const minutes = Math.floor((seconds % 3600) / 60);
+            const remainingSeconds = seconds % 60;
+            
+            const display = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+            document.getElementById('timerDisplay').textContent = display;
+        }
+
+        // Initialize time chart when track page is shown
+        function initTimeChart() {
+            const ctx = document.getElementById('timeChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Development', 'Design', 'Meetings', 'Planning', 'Testing'],
+                    datasets: [{
+                        label: 'Hours Spent',
+                        data: [4.5, 2.5, 1.5, 2.0, 3.0],
+                        backgroundColor: [
+                            'rgba(78, 115, 223, 0.8)',
+                            'rgba(28, 200, 138, 0.8)',
+                            'rgba(54, 185, 204, 0.8)',
+                            'rgba(246, 194, 62, 0.8)',
+                            'rgba(231, 74, 59, 0.8)'
+                        ],
+                        borderColor: [
+                            'rgba(78, 115, 223, 1)',
+                            'rgba(28, 200, 138, 1)',
+                            'rgba(54, 185, 204, 1)',
+                            'rgba(246, 194, 62, 1)',
+                            'rgba(231, 74, 59, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Hours'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event listener for track page
+        document.querySelector('a[onclick="showPage(\'trackPage\')"]').addEventListener('click', function() {
+            setTimeout(function() {
+                initTimeChart();
+            }, 100);
+        });
+
+        // ... rest of your existing code ...
+
+        // Initialize active tasks count when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            updateActiveTasksCount();
+        });
+
+        // Add this to your existing JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Star Rating Functionality
+            const stars = document.querySelectorAll('.rating-star');
+            const ratingText = document.querySelector('.rating-text');
+            let selectedRating = 0;
+
+            stars.forEach(star => {
+                star.addEventListener('mouseover', function() {
+                    const rating = this.dataset.rating;
+                    updateStars(rating);
+                    ratingText.textContent = getRatingText(rating);
+                });
+
+                star.addEventListener('mouseout', function() {
+                    updateStars(selectedRating);
+                    ratingText.textContent = selectedRating ? getRatingText(selectedRating) : 'Click to rate';
+                });
+
+                star.addEventListener('click', function() {
+                    selectedRating = this.dataset.rating;
+                    updateStars(selectedRating);
+                    ratingText.textContent = getRatingText(selectedRating);
+                });
+            });
+
+            function updateStars(rating) {
+                stars.forEach(star => {
+                    const starRating = star.dataset.rating;
+                    star.classList.toggle('active', starRating <= rating);
+                    star.classList.toggle('bi-star-fill', starRating <= rating);
+                    star.classList.toggle('bi-star', starRating > rating);
+                });
+            }
+
+            function getRatingText(rating) {
+                const texts = {
+                    1: 'Poor',
+                    2: 'Fair',
+                    3: 'Good',
+                    4: 'Very Good',
+                    5: 'Excellent'
+                };
+                return texts[rating] || 'Click to rate';
+            }
+
+            // Character Count for Improvement Text
+            const improvementText = document.getElementById('improvementText');
+            const charCount = document.getElementById('charCount');
+
+            improvementText.addEventListener('input', function() {
+                const count = this.value.length;
+                charCount.textContent = count;
+                if (count > 500) {
+                    this.value = this.value.substring(0, 500);
+                    charCount.textContent = 500;
+                }
+            });
+
+            // Form Submission
+            document.getElementById('feedbackForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Collect form data
+                const formData = {
+                    rating: selectedRating,
+                    likedFeatures: Array.from(document.querySelectorAll('.feature-checkbox:checked')).map(cb => cb.value),
+                    improvement: document.getElementById('improvementText').value,
+                    recommendation: document.querySelector('input[name="recommend"]:checked')?.value
+                };
+
+                // Show success message
+                const submitBtn = this.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="bi bi-check-circle-fill me-2"></i>Thank You!';
+                submitBtn.disabled = true;
+                submitBtn.classList.remove('btn-primary');
+                submitBtn.classList.add('btn-success');
+
+                // Reset form after 2 seconds
+                setTimeout(() => {
+                    this.reset();
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                    submitBtn.classList.remove('btn-success');
+                    submitBtn.classList.add('btn-primary');
+                    selectedRating = 0;
+                    updateStars(0);
+                    ratingText.textContent = 'Click to rate';
+                }, 2000);
+            });
+        });
+
+        // Add this to your existing JavaScript
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize tasks array as empty - Removing sample data
+            let tasks = [];
+
+            // Function to update active tasks count
+            function updateActiveTasksCount() {
+                const activeTasks = tasks.filter(task => !task.completed).length;
+                document.getElementById('activeTasksCount').textContent = activeTasks;
+                
+                // Update the dashboard card
+                const dashboardActiveTasks = document.querySelector('.dashboard-card:nth-child(1) .dashboard-value');
+                if (dashboardActiveTasks) {
+                    dashboardActiveTasks.textContent = activeTasks;
+                }
+            }
+
+            // Function to update task completion chart
+            function updateTaskChart() {
+                const completedTasks = tasks.filter(task => task.completed).length;
+                const activeTasks = tasks.filter(task => !task.completed).length;
+                
+                // Update the chart data
+                taskChart.data.datasets[0].data = [completedTasks, activeTasks];
+                taskChart.update();
+            }
+
+            // Function to update task list
+            function updateTaskList() {
+                const taskList = document.getElementById('taskList');
+                taskList.innerHTML = '';
+                
+                tasks.forEach(task => {
+                    const taskItem = document.createElement('div');
+                    taskItem.className = 'task-item';
+                    taskItem.innerHTML = `
+                        <div class="form-check">
+                            <input class="form-check-input task-checkbox" type="checkbox" 
+                                id="task${task.id}" ${task.completed ? 'checked' : ''}>
+                            <label class="form-check-label ${task.completed ? 'text-decoration-line-through' : ''}" 
+                                for="task${task.id}">
+                                ${task.title}
+                            </label>
+                        </div>
+                    `;
+                    
+                    // Add event listener for checkbox
+                    const checkbox = taskItem.querySelector('.task-checkbox');
+                    checkbox.addEventListener('change', function() {
+                        task.completed = this.checked;
+                        const label = this.nextElementSibling;
+                        if (task.completed) {
+                            label.classList.add('text-decoration-line-through');
+                        } else {
+                            label.classList.remove('text-decoration-line-through');
+                        }
+                        
+                        // Update dashboard and chart
+                        updateActiveTasksCount();
+                        updateTaskChart();
+                    });
+                    
+                    taskList.appendChild(taskItem);
+                });
+            }
+
+            // Initialize task list and counts
+            updateTaskList();
+            updateActiveTasksCount();
+            updateTaskChart();
+
+            // Task form submission
+            document.getElementById('taskForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                const taskInput = document.getElementById('taskInput');
+                const taskTitle = taskInput.value.trim();
+                
+                if (taskTitle) {
+                    const newTask = {
+                        id: tasks.length + 1,
+                        title: taskTitle,
+                        completed: false
+                    };
+                    
+                    tasks.push(newTask);
+                    taskInput.value = '';
+                    
+                    // Update UI
+                    updateTaskList();
+                    updateActiveTasksCount();
+                    updateTaskChart();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
