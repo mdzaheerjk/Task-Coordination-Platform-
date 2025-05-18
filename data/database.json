@@ -1,0 +1,96 @@
+{
+    "users": [
+        {
+            "id": "user1",
+            "email": "user@example.com",
+            "name": "John Doe",
+            "loginHistory": [
+                {
+                    "date": "2024-03-17T10:30:00Z",
+                    "ip": "192.168.1.1"
+                },
+                {
+                    "date": "2024-03-18T09:15:00Z",
+                    "ip": "192.168.1.1"
+                }
+            ],
+            "lastLogin": "2024-03-18T09:15:00Z"
+        }
+    ],
+    "tasks": [
+        
+    ],
+    "analytics": {
+        "dailyTaskCompletion": {
+            "user1": {
+                "2024-03-17": {
+                    "completed": 5,
+                    "pending": 2,
+                    "total": 7
+                },
+                "2024-03-18": {
+                    "completed": 3,
+                    "pending": 4,
+                    "total": 7
+                }
+            }
+        },
+        "projectStats": {
+            "user1": {
+                "Marketing": {
+                    "totalTasks": 10,
+                    "completedTasks": 7,
+                    "pendingTasks": 3,
+                    "completionRate": 70
+                },
+                "Development": {
+                    "totalTasks": 15,
+                    "completedTasks": 10,
+                    "pendingTasks": 5,
+                    "completionRate": 66.67
+                }
+            }
+        },
+        "productivityTrends": {
+            "user1": {
+                "weekly": {
+                    "2024-W11": {
+                        "monday": 5,
+                        "tuesday": 7,
+                        "wednesday": 6,
+                        "thursday": 8,
+                        "friday": 4,
+                        "saturday": 2,
+                        "sunday": 1
+                    }
+                },
+                "monthly": {
+                    "2024-03": {
+                        "week1": 25,
+                        "week2": 30,
+                        "week3": 28,
+                        "week4": 32
+                    }
+                }
+            }
+        }
+    },
+    "projects": [
+        {
+            "id": "proj1",
+            "name": "Marketing",
+            "description": "Marketing campaign for Q2",
+            "createdAt": "2024-03-01T00:00:00Z",
+            "members": ["user1"],
+            "status": "active"
+        },
+        {
+            "id": "proj2",
+            "name": "Development",
+            "description": "New feature development",
+            "createdAt": "2024-03-01T00:00:00Z",
+            "members": ["user1"],
+            "status": "active"
+        }
+    ]
+} 
